@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		15C0777D2A3F52D100DC66B4 /* Section.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C0777C2A3F52D100DC66B4 /* Section.swift */; };
+		15C0777F2A3F5B0A00DC66B4 /* SectionHeaderReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C0777E2A3F5B0A00DC66B4 /* SectionHeaderReusableView.swift */; };
 		180DC61523C78D9800486B1A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 180DC61423C78D9800486B1A /* LaunchScreen.storyboard */; };
 		185CB1FC23C78CE6009F7571 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185CB1FB23C78CE6009F7571 /* AppDelegate.swift */; };
 		185CB1FE23C78CE6009F7571 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185CB1FD23C78CE6009F7571 /* SceneDelegate.swift */; };
@@ -19,6 +21,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		15C0777C2A3F52D100DC66B4 /* Section.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Section.swift; sourceTree = "<group>"; };
+		15C0777E2A3F5B0A00DC66B4 /* SectionHeaderReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderReusableView.swift; sourceTree = "<group>"; };
 		180DC61423C78D9800486B1A /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		185CB1F823C78CE6009F7571 /* DiffableDataSources.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DiffableDataSources.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		185CB1FB23C78CE6009F7571 /* AppDelegate.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -74,6 +78,8 @@
 				B09EE67423DFE6D9006CEDE0 /* VideoCollectionViewCell.swift */,
 				B09EE67223DFE6C2006CEDE0 /* Video.swift */,
 				B0F557EB23EF455600314EC5 /* UIView+IBInspectable.swift */,
+				15C0777C2A3F52D100DC66B4 /* Section.swift */,
+				15C0777E2A3F5B0A00DC66B4 /* SectionHeaderReusableView.swift */,
 			);
 			path = DiffableDataSources;
 			sourceTree = "<group>";
@@ -152,8 +158,10 @@
 				B09EE67523DFE6D9006CEDE0 /* VideoCollectionViewCell.swift in Sources */,
 				B09EE66F23DFE0E1006CEDE0 /* VideosViewController.swift in Sources */,
 				B0F557EC23EF455600314EC5 /* UIView+IBInspectable.swift in Sources */,
+				15C0777D2A3F52D100DC66B4 /* Section.swift in Sources */,
 				185CB1FC23C78CE6009F7571 /* AppDelegate.swift in Sources */,
 				185CB1FE23C78CE6009F7571 /* SceneDelegate.swift in Sources */,
+				15C0777F2A3F5B0A00DC66B4 /* SectionHeaderReusableView.swift in Sources */,
 				B09EE67323DFE6C2006CEDE0 /* Video.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

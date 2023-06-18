@@ -2,22 +2,17 @@ import UIKit
 import SafariServices
 
 class VideosViewController: UICollectionViewController {
-  enum Section {
-    case main
-  }
   
   typealias DataSource = UICollectionViewDiffableDataSource<Section, Video>
   typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Video>
 
 
   // MARK: - Properties
-  private var videoList = Video.allVideos
+  private var sections = Section.allSections
+
   private var searchController = UISearchController(searchResultsController: nil)
   
   private lazy var dataSource = makeDataSource()
-  
-  // MARK: - Value Types
-  
   // MARK: - Life Cycles
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -27,15 +22,15 @@ class VideosViewController: UICollectionViewController {
     applySnapshot(animatingDifferences: false)
   }
   
-  // 1
+ 
   func applySnapshot(animatingDifferences: Bool = true) {
-    // 2
+    
     var snapshot = Snapshot()
-    // 3
-    snapshot.appendSections([.main])
-    // 4
-    snapshot.appendItems(videoList)
-    // 5
+    snapshot.appendSections(sections)
+    sections.forEach { section in
+      snapshot.appendItems(section.videos, toSection: section)
+    }
+
     dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
   }
 
@@ -53,11 +48,28 @@ class VideosViewController: UICollectionViewController {
         cell?.video = video
         return cell
     })
+    
+    // 1
+    dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
+      // 2
+      guard kind == UICollectionView.elementKindSectionHeader else {
+        return nil
+      }
+      // 3
+      let view = collectionView.dequeueReusableSupplementaryView(
+        ofKind: kind,
+        withReuseIdentifier: SectionHeaderReusableView.reuseIdentifier,
+        for: indexPath) as? SectionHeaderReusableView
+      // 4
+      let section = self.dataSource.snapshot()
+        .sectionIdentifiers[indexPath.section]
+      view?.titleLabel.text = section.title
+      return view
+    }
+
     return dataSource
   }
 
-  
-  // MARK: - Functions
 }
 
 // MARK: - UICollectionViewDataSource Number of itemSelection
@@ -89,22 +101,32 @@ extension VideosViewController {
 // MARK: - UISearchResultsUpdating Delegate
 extension VideosViewController: UISearchResultsUpdating {
   func updateSearchResults(for searchController: UISearchController) {
-    videoList = filteredVideos(for: searchController.searchBar.text)
+    sections = filteredSections(for: searchController.searchBar.text)
     applySnapshot()
   }
   
-  func filteredVideos(for queryOrNil: String?) -> [Video] {
-    let videos = Video.allVideos
+  func filteredSections(for queryOrNil: String?) -> [Section] {
+    let sections = Section.allSections
+
     guard
       let query = queryOrNil,
       !query.isEmpty
       else {
-        return videos
+        return sections
     }
-    return videos.filter {
-      return $0.title.lowercased().contains(query.lowercased())
+      
+    return sections.filter { section in
+      var matches = section.title.lowercased().contains(query.lowercased())
+      for video in section.videos {
+        if video.title.lowercased().contains(query.lowercased()) {
+          matches = true
+          break
+        }
+      }
+      return matches
     }
   }
+
   
   func configureSearchController() {
     searchController.searchResultsUpdater = self
@@ -118,6 +140,13 @@ extension VideosViewController: UISearchResultsUpdating {
 // MARK: - Layout Handling
 extension VideosViewController {
   private func configureLayout() {
+    
+    collectionView.register(
+      SectionHeaderReusableView.self,
+      forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+      withReuseIdentifier: SectionHeaderReusableView.reuseIdentifier
+    )
+
     collectionView.collectionViewLayout = UICollectionViewCompositionalLayout(sectionProvider: { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
       let isPhone = layoutEnvironment.traitCollection.userInterfaceIdiom == UIUserInterfaceIdiom.phone
       let size = NSCollectionLayoutSize(
@@ -130,6 +159,18 @@ extension VideosViewController {
       let section = NSCollectionLayoutSection(group: group)
       section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
       section.interGroupSpacing = 10
+      
+      // Supplementary header view setup
+      let headerFooterSize = NSCollectionLayoutSize(
+        widthDimension: .fractionalWidth(1.0),
+        heightDimension: .estimated(20)
+      )
+      let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+        layoutSize: headerFooterSize,
+        elementKind: UICollectionView.elementKindSectionHeader,
+        alignment: .top
+      )
+      section.boundarySupplementaryItems = [sectionHeader]
       return section
     })
   }
