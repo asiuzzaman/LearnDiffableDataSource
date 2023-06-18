@@ -6,11 +6,15 @@ class VideosViewController: UICollectionViewController {
     case main
   }
   
-  //typealias DataSource = UICollectionViewDiffableDataSource<Section, Video>
+  typealias DataSource = UICollectionViewDiffableDataSource<Section, Video>
+  typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Video>
+
 
   // MARK: - Properties
   private var videoList = Video.allVideos
   private var searchController = UISearchController(searchResultsController: nil)
+  
+  private lazy var dataSource = makeDataSource()
   
   // MARK: - Value Types
   
@@ -20,32 +24,45 @@ class VideosViewController: UICollectionViewController {
     view.backgroundColor = .white
     configureSearchController()
     configureLayout()
+    applySnapshot(animatingDifferences: false)
   }
+  
+  // 1
+  func applySnapshot(animatingDifferences: Bool = true) {
+    // 2
+    var snapshot = Snapshot()
+    // 3
+    snapshot.appendSections([.main])
+    // 4
+    snapshot.appendItems(videoList)
+    // 5
+    dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
+  }
+
+  
+  func makeDataSource() -> DataSource {
+    // 1
+    let dataSource = DataSource(
+      collectionView: collectionView,
+      cellProvider: { (collectionView, indexPath, video) ->
+        UICollectionViewCell? in
+        // 2
+        let cell = collectionView.dequeueReusableCell(
+          withReuseIdentifier: "VideoCollectionViewCell",
+          for: indexPath) as? VideoCollectionViewCell
+        cell?.video = video
+        return cell
+    })
+    return dataSource
+  }
+
   
   // MARK: - Functions
 }
 
 // MARK: - UICollectionViewDataSource Number of itemSelection
 extension VideosViewController {
-  override func collectionView(
-    _ collectionView: UICollectionView,
-    numberOfItemsInSection section: Int
-  ) -> Int {
-    return videoList.count
-  }
   
-  
-  override func collectionView(
-    _ collectionView: UICollectionView,
-    cellForItemAt indexPath: IndexPath
-  ) -> UICollectionViewCell {
-    let video = videoList[indexPath.row]
-    guard let cell = collectionView.dequeueReusableCell(
-      withReuseIdentifier: "VideoCollectionViewCell",
-      for: indexPath) as? VideoCollectionViewCell else { fatalError() }
-    cell.video = video
-    return cell
-  }
 }
 
 // MARK: - UICollectionViewDelegate
@@ -54,7 +71,12 @@ extension VideosViewController {
     _ collectionView: UICollectionView,
     didSelectItemAt indexPath: IndexPath
   ) {
-    let video = videoList[indexPath.row]
+    
+    guard let video = dataSource.itemIdentifier(for: indexPath) else {
+      print("video not found")
+      return
+    }
+
     guard let link = video.link else {
       print("Invalid link")
       return
@@ -68,7 +90,7 @@ extension VideosViewController {
 extension VideosViewController: UISearchResultsUpdating {
   func updateSearchResults(for searchController: UISearchController) {
     videoList = filteredVideos(for: searchController.searchBar.text)
-    collectionView.reloadData()
+    applySnapshot()
   }
   
   func filteredVideos(for queryOrNil: String?) -> [Video] {
